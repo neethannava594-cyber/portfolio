@@ -33,9 +33,7 @@
   const hamburger = document.getElementById('navHamburger');
   const mobileMenu = document.getElementById('mobileMenu');
 
-  // ==========================================
-  // FRAME SEQUENCER — Preload & Draw
-  // ==========================================
+  const TOTAL_FRAMES = 150; // Load 150 frames (every 2nd frame) for performance
   const frames = [];
   let loadedCount = 0;
   let currentFrame = 0;
@@ -45,14 +43,14 @@
     return String(n).padStart(3, '0');
   }
 
-  /** Preload all frames into Image objects */
+  /** Preload frames with step spacing */
   function preloadFrames() {
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image();
-      img.src = FRAME_PATH + padFrame(i) + FRAME_EXT;
+      const frameFileNumber = i * 2; // Step by 2 to cover all 300 frames
+      img.src = FRAME_PATH + padFrame(frameFileNumber) + FRAME_EXT;
       img.onload = () => {
         loadedCount++;
-        // Draw first frame as soon as it loads
         if (i === 1) {
           resizeCanvas();
           drawFrame(0);
