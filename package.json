@@ -1,0 +1,12 @@
+{
+  "name": "navaneethan-portfolio",
+  "version": "1.0.0",
+  "description": "Navaneethan — Professional Video Editor Portfolio",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 3000"
+  },
+  "keywords": [],
+  "author": "Navaneethan",
+  "license": "ISC"
+}
