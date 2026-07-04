@@ -279,6 +279,7 @@ a {
   display: block;
   background: var(--bg-primary);
   z-index: 0;
+  will-change: transform;
 }
 
 /* Text Overlays */
@@ -298,6 +299,7 @@ a {
   transition: opacity 0.4s ease;
   z-index: 10;
   padding: 2rem;
+  will-change: opacity;
 }
 
 .hero__overlay.visible {
