@@ -16,7 +16,6 @@
   // ==========================================
   // CONFIG
   // ==========================================
-  const TOTAL_FRAMES = 110;
   const FRAME_PATH = './frames/ezgif-frame-';
   const FRAME_EXT = '.jpg';
 
