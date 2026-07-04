@@ -94,8 +94,12 @@
 
 
   // ==========================================
-  // SCROLL-CONTROLLED FRAME PLAYBACK (Hero Only)
+  // SCROLL-CONTROLLED FRAME PLAYBACK (Hero Only with Inertia Smoothing)
   // ==========================================
+  let targetProgress = 0;
+  let currentProgress = 0;
+  const lerpFactor = 0.08; // Control inertia smoothing (lower = smoother/slower, higher = faster)
+
   function getHeroScrollProgress() {
     const heroHeight = heroSection.offsetHeight - window.innerHeight;
     if (heroHeight <= 0) return 0;
@@ -103,9 +107,28 @@
   }
 
   function updateFrameOnScroll() {
-    const progress = getHeroScrollProgress();
+    targetProgress = getHeroScrollProgress();
+    
+    // Hide scroll indicator after scrolling a bit
+    if (targetProgress > 0.05) {
+      scrollIndicator.classList.add('hidden');
+    } else {
+      scrollIndicator.classList.remove('hidden');
+    }
+  }
+
+  // Smooth animation render loop (ideal for mobile touch gestures)
+  function renderLoop() {
+    // Linear interpolation
+    currentProgress += (targetProgress - currentProgress) * lerpFactor;
+    
+    // If progress is extremely close, snap to target
+    if (Math.abs(targetProgress - currentProgress) < 0.0005) {
+      currentProgress = targetProgress;
+    }
+
     const frameIndex = Math.min(
-      Math.floor(progress * (TOTAL_FRAMES - 1)),
+      Math.floor(currentProgress * (TOTAL_FRAMES - 1)),
       TOTAL_FRAMES - 1
     );
 
@@ -115,15 +138,13 @@
     }
 
     // Update overlays sequentially during hero scroll
-    updateOverlays(progress);
+    updateOverlays(currentProgress);
 
-    // Hide scroll indicator after scrolling a bit
-    if (progress > 0.05) {
-      scrollIndicator.classList.add('hidden');
-    } else {
-      scrollIndicator.classList.remove('hidden');
-    }
+    requestAnimationFrame(renderLoop);
   }
+
+  // Start the render loop
+  requestAnimationFrame(renderLoop);
 
 
   // ==========================================
