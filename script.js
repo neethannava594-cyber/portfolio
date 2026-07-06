@@ -10,7 +10,7 @@
  *   - Scroll-jacking releases page once animation completes.
  */
 
-import Lenis from 'lenis';
+import Lenis from 'https://cdn.jsdelivr.net/npm/lenis@1.1.20/+esm';
 
 // ==========================================
 // CONFIG
