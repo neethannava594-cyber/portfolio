@@ -5,3 +5,4 @@ dist/
 .gemini/
 antigravity-ide/
 *.log
+# Force rebuild
