@@ -107,6 +107,10 @@ function loadRemainingFrames() {
 // CANVAS
 // ==========================================
 function resizeCanvas() {
+  // Fix for mobile browser URL bar shifting viewport height
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+  
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
