@@ -52,7 +52,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-1) transparent;
 }
@@ -266,12 +265,12 @@ a {
    ============================================ */
 .hero {
   position: relative;
-  height: 400vh;
+  height: 100vh;
   z-index: 1;
 }
 
 .hero__canvas {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -279,7 +278,8 @@ a {
   display: block;
   background: var(--bg-primary);
   z-index: 0;
-  will-change: transform;
+  /* 'transform' was wrong here — canvas redraws via drawImage, not CSS transforms */
+  will-change: auto;
 }
 
 /* Text Overlays */
@@ -302,8 +302,11 @@ a {
   will-change: opacity;
 }
 
+/* NOTE: opacity is controlled exclusively by JS (style.opacity).
+   The .visible class only toggles pointer-events via the parent.
+   Do NOT set opacity:1 here — it overrides the JS fade calculations. */
 .hero__overlay.visible {
-  opacity: 1;
+  pointer-events: auto;
 }
 
 .hero__tag {
@@ -644,6 +647,7 @@ a {
 
 @keyframes marqueeScroll {
   0% { transform: translateX(0); }
+  /* Scroll exactly 50% — the content is doubled so this creates a seamless loop */
   100% { transform: translateX(-50%); }
 }
 
@@ -696,6 +700,34 @@ a {
   aspect-ratio: 16 / 9;
   overflow: hidden;
   background: #0f0f14;
+}
+
+/* Shimmer skeleton while Drive thumbnails load */
+.work-card__thumbnail::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Hide shimmer once image is loaded */
+.work-card__thumbnail.loaded::before {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .work-card__thumb-img {
@@ -862,6 +894,25 @@ a {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.skill-card__pct {
+  margin-left: auto;
+  font-family: var(--font-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.6s var(--ease-out-expo) 0.4s,
+              transform 0.6s var(--ease-out-expo) 0.4s;
+}
+
+/* Animate in when parent card is revealed */
+.reveal-clip-slide.revealed .skill-card__pct {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .skill-card__icon-dot {
@@ -1381,6 +1432,12 @@ a {
     flex-direction: column;
     text-align: center;
   }
+
+  /* Prevent overlay text from hiding behind fixed nav on mobile */
+  .hero__overlay {
+    padding-top: calc(2rem + 70px);
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 400px) {
@@ -1510,4 +1567,64 @@ a {
   width: 100%;
   height: 100%;
   border: 0;
+}
+/* Loading screen */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #0e0e14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10000;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+  pointer-events: none;
+}
+.loading-logo {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  animation: loadingPulse 1.6s ease-in-out infinite alternate;
+}
+@keyframes loadingPulse {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+.progress-bar {
+  width: 220px;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+/* Auto-animated progress bar — sweeps from 0→80% in 4s then holds */
+.progress {
+  width: 0%;
+  height: 100%;
+  background: var(--gradient-accent);
+  box-shadow: 0 0 10px rgba(200,160,72,0.5);
+  border-radius: 2px;
+  animation: loadingBar 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes loadingBar {
+  0%   { width: 0%; }
+  70%  { width: 80%; }
+  100% { width: 95%; }
+}
+/* Custom cursor */
+.custom-cursor {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--text-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  /* No transition on transform — cursor must snap to mouse position instantly */
+  transition: background 0.2s ease;
+  z-index: 10001;
 }
